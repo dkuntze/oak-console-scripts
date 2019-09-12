@@ -12,12 +12,16 @@ import org.apache.jackrabbit.oak.api.*
 class NamespaceDump {
 	NodeStore nodeStore;
 	
+	private File dumpFile = new File("namespaces.cnd")
+	
 	def dump(){
 		def ns = nodeStore.getRoot().getChildNode("jcr:system").getChildNode("rep:namespaces");
 		
-		ns.getProperties().each { prop ->
-			if(prop.getName().find(':')<0){
-				println("<'"+prop.getName()+"'='"+prop.getValue(Type.STRING)+"'>");
+		dumpFile.withPrintWriter { pw ->
+			ns.getProperties().each { prop ->
+				if(prop.getName().find(':')<0){
+					pw.println("<'"+prop.getName()+"'='"+prop.getValue(Type.STRING)+"'>");
+				}
 			}
 		}
 	}
