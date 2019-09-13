@@ -45,7 +45,10 @@ class UnregisteredNamespaceChecker {
 			}	
 		}
 		++checkedNodeCount;
-			
+		if(checkedNodeCount % 1000 == 0){
+			println("Checked $checkedNodeCount");	
+		}
+		
 		// Check child nodes
 		ns.getChildNodeEntries().each { cne ->
 			checkNode(cne.getNodeState());	
