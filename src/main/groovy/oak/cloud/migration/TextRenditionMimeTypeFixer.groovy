@@ -33,7 +33,7 @@ class TextRenditionMimeTypeFixer {
 
 	if(fixedRenditionCount > 0 &&  fixedRenditionCount % 1000 == 0){
 	   println("Saving 1000 fixed renditions");	
-	   ns.merge(nodeStore.root.builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	   nodeStore.merge(nodeStore.root.builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
 	   println("Saved");	
 	}
 
