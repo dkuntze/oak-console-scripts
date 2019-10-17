@@ -13,12 +13,12 @@ class TextRenditionMimeTypeFixer {
     def fixedRenditionCount = 0 as long;
     def checkedNodeCount = 0 as long;
     
-    def traverse(ns,path,name){
+    def traverse(ns, nb, path, name, rnb){
 	if(name=='cqdam.text.txt'){
 	    ns = ns.getChildNode('jcr:content');
 
 	    if(ns.getString('jcr:mimeType')==null){
-		ns.builder().setProperty('jcr:mimeType','text/plain');
+		nb.setProperty('jcr:mimeType','text/plain');
 		println("Updated mimetype at "+path);
 		++fixedRenditionCount;
 	    } else {
@@ -33,13 +33,13 @@ class TextRenditionMimeTypeFixer {
 
 	if(fixedRenditionCount > 0 &&  fixedRenditionCount % 1000 == 0){
 	   println("Saving 1000 fixed renditions");	
-	   nodeStore.merge(nodeStore.getRoot().builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	   nodeStore.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
 	   println("Saved");	
 	}
 
 	// Check child nodes
 	ns.getChildNodeEntries().each { cne ->
-	    traverse(cne.getNodeState(), path+'/'+cne.getName(), cne.getName());	
+	    traverse(cne.getNodeState(), nb.getChildNode(cne.getName()), path+'/'+cne.getName(), cne.getName(), rnb);	
 	}
     }
     
@@ -49,8 +49,11 @@ class TextRenditionMimeTypeFixer {
         println("Fixing mimetypes");
         def timeStarted = new Date().getTime();
         
-        traverse(nodeStore.getRoot().getChildNode("content").getChildNode("dam").getChildNode("marketing"), "/content/dam/marketing", "marketing");
-        nodeStore.merge(nodeStore.getRoot().builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	def nodeState = nodeStore.getRoot().getChildNode("content").getChildNode("dam").getChildNode("marketing");
+	def nodeBuilder = nodeState.builder();
+	    
+        traverse(nodeState, nodeBuilder, "/content/dam/marketing", "marketing", nodeBuilder);
+        nodeStore.merge(nodeBuilder, EmptyHook.INSTANCE, CommitInfo.EMPTY);
         def timeTaken = new Date().getTime() - timeStarted;
         
         println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validRenditionCount} valid text renditions and fixed ${fixedRenditionCount}");
