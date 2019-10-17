@@ -15,8 +15,14 @@ class TextRenditionMimeTypeFixer {
     
     def traverse(ns, nb, path, name, rnb){
 	if(name=='cqdam.text.txt'){
+	    
+	    if(nb.hasProperty('jcr:mimeType')){
+		nb.removeProperty('jcr:mimeType');
+	    }
+		
+		
 	    ns = ns.getChildNode('jcr:content');
-
+	    nb = nb.getChildNode('jcr:content');
 	    if(ns.getString('jcr:mimeType')==null){
 		nb.setProperty('jcr:mimeType','text/plain');
 		println("Updated mimetype at "+path);
