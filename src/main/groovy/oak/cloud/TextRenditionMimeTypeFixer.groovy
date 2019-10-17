@@ -39,7 +39,7 @@ class TextRenditionMimeTypeFixer {
 
 	// Check child nodes
 	ns.getChildNodeEntries().each { cne ->
-	    checkNode(cne.getNodeState(), path+'/'+cne.getName());	
+	    traverse(cne.getNodeState(), path+'/'+cne.getName());	
 	}
     }
     
@@ -49,7 +49,7 @@ class TextRenditionMimeTypeFixer {
         println("Fixing mimetypes");
         def timeStarted = new Date().getTime();
         
-        checkNode(nodeStore.getRoot().getChildNode("content").getChildNode("dam"));
+        traverse(nodeStore.getRoot().getChildNode("content").getChildNode("dam"));
         
         def timeTaken = new Date().getTime() - timeStarted;
         
