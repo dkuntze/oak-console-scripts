@@ -49,7 +49,7 @@ class TextRenditionMimeTypeFixer {
         println("Fixing mimetypes");
         def timeStarted = new Date().getTime();
         
-        traverse(nodeStore.getRoot().getChildNode("content").getChildNode("dam"));
+        traverse(nodeStore.getRoot().getChildNode("content").getChildNode("dam"), "/content/dam");
         
         def timeTaken = new Date().getTime() - timeStarted;
         
