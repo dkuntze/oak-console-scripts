@@ -49,10 +49,11 @@ class TextRenditionMimeTypeFixer {
         println("Fixing mimetypes");
         def timeStarted = new Date().getTime();
         
+	def rootNodeBuilder = nodeStore.getRoot().builder();
 	def nodeState = nodeStore.getRoot().getChildNode("content").getChildNode("dam").getChildNode("marketing");
-	def nodeBuilder = nodeState.builder();
+	def nodeBuilder = rootNodeBuilder.getChildNode("content").getChildNode("dam").getChildNode("marketing");
 	    
-        traverse(nodeState, nodeBuilder, "/content/dam/marketing", "marketing", nodeBuilder);
+        traverse(nodeState, nodeBuilder, "/content/dam/marketing", "marketing", rootNodeBuilder);
         nodeStore.merge(nodeBuilder, EmptyHook.INSTANCE, CommitInfo.EMPTY);
         def timeTaken = new Date().getTime() - timeStarted;
         
