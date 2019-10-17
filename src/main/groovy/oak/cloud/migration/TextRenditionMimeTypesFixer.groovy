@@ -1,4 +1,3 @@
-import org.apache.jackrabbit.oak.spi.commit.CommitInfo
 import org.apache.jackrabbit.oak.spi.commit.EmptyHook
 import org.apache.jackrabbit.oak.spi.state.NodeStore
 import org.apache.jackrabbit.oak.commons.PathUtils
@@ -31,9 +30,9 @@ class TextRenditionMimeTypeFixer {
 	    println("Checked $checkedNodeCount");	
 	}
 
-	if(fixedRenditionCount % 1000 == 0){
+	if(fixedRenditionCount > 0 &&  fixedRenditionCount % 1000 == 0){
 	   println("Saving 1000 fixed renditions");	
-	   ns.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	   ns.merge(nodeStore.root.builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
 	   println("Saved");	
 	}
 
@@ -50,7 +49,7 @@ class TextRenditionMimeTypeFixer {
         def timeStarted = new Date().getTime();
         
         traverse(nodeStore.getRoot().getChildNode("content").getChildNode("dam"), "/content/dam", "dam");
-        
+        nodeStore.getRoot.merge(nodeStore.root.builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
         def timeTaken = new Date().getTime() - timeStarted;
         
         println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validRenditionCount} valid text renditions and fixed ${fixedRenditionCount}");
@@ -60,4 +59,3 @@ class TextRenditionMimeTypeFixer {
 }
 
 new TextRenditionMimeTypeFixer(nodeStore: session.store).fixMimeTypes();
-
