@@ -13,8 +13,8 @@ class TextRenditionMimeTypeFixer {
     def fixedRenditionCount = 0 as long;
     def checkedNodeCount = 0 as long;
     
-    def traverse(ns, path){
-	if(ns.getName()=='cqdam.text.txt'){
+    def traverse(ns,path,name){
+	if(name=='cqdam.text.txt'){
 	    ns = ns.getChildNode('jcr:content');
 
 	    if(ns.getString('jcr:mimeType')==null){
@@ -39,7 +39,7 @@ class TextRenditionMimeTypeFixer {
 
 	// Check child nodes
 	ns.getChildNodeEntries().each { cne ->
-	    traverse(cne.getNodeState(), path+'/'+cne.getName());	
+	    traverse(cne.getNodeState(), path+'/'+cne.getName(), cne.getName());	
 	}
     }
     
