@@ -43,9 +43,9 @@ class TextRenditionMimeTypeFixer {
 	if(needsSave &&  fixedRenditionCount % 1000 == 0){
 	   println("Saving 1000 fixed renditions");	
 	   nodeStore.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
-	   println("Saved");	
+	   println("Saved");
+	   needsSave=false;
 	}
-
 	// Check child nodes
 	ns.getChildNodeEntries().each { cne ->
 	    traverse(cne.getNodeState(), nb.getChildNode(cne.getName()), path+'/'+cne.getName(), cne.getName(), rnb);	
