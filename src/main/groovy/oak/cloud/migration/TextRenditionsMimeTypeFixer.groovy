@@ -12,9 +12,11 @@ class TextRenditionMimeTypeFixer {
     def validRenditionCount = 0 as long;
     def fixedRenditionCount = 0 as long;
     def checkedNodeCount = 0 as long;
-    
+    def needsSave = false;
+	
     def traverse(ns, nb, path, name, rnb){
-	if(name=='cqdam.text.txt'){
+	 
+	  if(name=='cqdam.text.txt'){
 	    
 	    if(nb.hasProperty('jcr:mimeType')){
 		nb.removeProperty('jcr:mimeType');
@@ -26,6 +28,7 @@ class TextRenditionMimeTypeFixer {
 	    if(ns.getString('jcr:mimeType')==null){
 		nb.setProperty('jcr:mimeType','text/plain');
 		println("Updated mimetype at "+path);
+		needsSave = true;
 		++fixedRenditionCount;
 	    } else {
 		++validRenditionCount;   
@@ -37,7 +40,7 @@ class TextRenditionMimeTypeFixer {
 	    println("Checked $checkedNodeCount");	
 	}
 
-	if(fixedRenditionCount > 0 &&  fixedRenditionCount % 1000 == 0){
+	if(needsSave &&  fixedRenditionCount % 1000 == 0){
 	   println("Saving 1000 fixed renditions");	
 	   nodeStore.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
 	   println("Saved");	
@@ -56,10 +59,10 @@ class TextRenditionMimeTypeFixer {
         def timeStarted = new Date().getTime();
         
 	def rootNodeBuilder = nodeStore.getRoot().builder();
-	def nodeState = nodeStore.getRoot().getChildNode("content").getChildNode("dam").getChildNode("marketing");
-	def nodeBuilder = rootNodeBuilder.getChildNode("content").getChildNode("dam").getChildNode("marketing");
+	def nodeState = nodeStore.getRoot().getChildNode("content").getChildNode("dam");
+	def nodeBuilder = rootNodeBuilder.getChildNode("content").getChildNode("dam");
 	    
-        traverse(nodeState, nodeBuilder, "/content/dam/marketing", "marketing", rootNodeBuilder);
+        traverse(nodeState, nodeBuilder, "/content/dam", "dam", rootNodeBuilder);
         nodeStore.merge(rootNodeBuilder, EmptyHook.INSTANCE, CommitInfo.EMPTY);
         def timeTaken = new Date().getTime() - timeStarted;
         
