@@ -5,39 +5,59 @@ import org.apache.jackrabbit.oak.commons.PathUtils
 import com.google.common.collect.Lists
 import java.util.List
 
-def setProperty(def session, def nodepath, def propertyName, def propertyValue, def isMulti) {
-    NodeStore ns = session.store
-    def rnb = ns.root.builder()
-    def nb = rnb;
-    String path;
-    if (PathUtils.isAbsolute(nodepath)) {
-        path = nodepath;
-    } else {
-        path = PathUtils.concat(session.getWorkingPath(), nodepath);
-    }
-    List<String> elements = Lists.newArrayList();
-    PathUtils.elements(path).each{String element ->
-        if (PathUtils.denotesParent(element)) {
-            if (!elements.isEmpty()) {
-                elements.remove(elements.size() - 1);
+
+class TextRenditionMimeTypeFixer {
+	def NodeStore nodeStore;
+    
+    def validRenditionCount = 0 as long;
+    def fixedRenditionCount = 0 as long;
+    def checkedNodeCount = 0 as long;
+    
+    def traverse(ns, path){
+        if(ns.getName()=='cqdam.text.txt'){
+		    ns = ns.getChildNode('jcr:content');
+            
+            if(ns.getString('jcr:mimeType')==null){
+                ns.builder.setProperty('jcr:mimeType','text/plain');
+                println("Updated mimetype at "+path);
+                ++fixedRenditionCount;
+            } else {
+                ++validRenditionCount;   
             }
-        } else if (!PathUtils.denotesCurrent(element)) {
-            elements.add(element);
         }
-    }
+        
+        ++checkedNodeCount;
+		if(checkedNodeCount % 1000 == 0){
+			println("Checked $checkedNodeCount");	
+		}
+        
+        if(fixedRenditionCount % 1000 == 0){
+           println("Saving 1000 fixed renditions");	
+           ns.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
+           println("Saved");	
+        }
 
-    elements.each {
-      if(it.size() > 0) {
-        nb = nb.getChildNode(it)
-      }
-    }
-    println "Setting property ${propertyName}: ${propertyValue} on node ${nodepath}"
-    if(isMulti) {
-       nb.setProperty(propertyName, Lists.newArrayList(propertyValue), org.apache.jackrabbit.oak.api.Type.STRINGS)
-    } else {
-       nb.setProperty(propertyName, propertyValue)
-    }
-    ns.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY)
+		// Check child nodes
+		ns.getChildNodeEntries().each { cne ->
+			checkNode(cne.getNodeState(), path+'/'+cne.getName());	
+		}
+	}
+    
+    
+    
+    def fixMimeTypes(){
+        println "Fixing mimetypes"
+        def timeStarted = new Date().getTime();
+        
+        checkNode(nodeStore.getRoot().getChildNode("content").getChildNode("dam")));
+        
+        def timeTaken = new Date().getTime() - timeStarted;
+        
+        println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validRenditionCount} valid text renditions and fixed ${fixedRenditionCount}");
 
-    println "Done"
+        println "Done"
+    }
 }
+
+new TextRenditionMimeTypeFixer(nodeStore: session.store).fixMimeTypes()
+
