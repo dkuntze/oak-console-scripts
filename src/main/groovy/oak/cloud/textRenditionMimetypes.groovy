@@ -14,39 +14,39 @@ class TextRenditionMimeTypeFixer {
     def checkedNodeCount = 0 as long;
     
     def traverse(ns, path){
-        if(ns.getName()=='cqdam.text.txt'){
-		    ns = ns.getChildNode('jcr:content');
-            
-            if(ns.getString('jcr:mimeType')==null){
-                ns.builder.setProperty('jcr:mimeType','text/plain');
-                println("Updated mimetype at "+path);
-                ++fixedRenditionCount;
-            } else {
-                ++validRenditionCount;   
-            }
-        }
-        
-        ++checkedNodeCount;
-		if(checkedNodeCount % 1000 == 0){
-			println("Checked $checkedNodeCount");	
-		}
-        
-        if(fixedRenditionCount % 1000 == 0){
-           println("Saving 1000 fixed renditions");	
-           ns.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
-           println("Saved");	
-        }
+	if(ns.getName()=='cqdam.text.txt'){
+	    ns = ns.getChildNode('jcr:content');
 
-		// Check child nodes
-		ns.getChildNodeEntries().each { cne ->
-			checkNode(cne.getNodeState(), path+'/'+cne.getName());	
-		}
+	    if(ns.getString('jcr:mimeType')==null){
+		ns.builder.setProperty('jcr:mimeType','text/plain');
+		println("Updated mimetype at "+path);
+		++fixedRenditionCount;
+	    } else {
+		++validRenditionCount;   
+	    }
 	}
+
+	++checkedNodeCount;
+	if(checkedNodeCount % 1000 == 0){
+	    println("Checked $checkedNodeCount");	
+	}
+
+	if(fixedRenditionCount % 1000 == 0){
+	   println("Saving 1000 fixed renditions");	
+	   ns.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	   println("Saved");	
+	}
+
+	// Check child nodes
+	ns.getChildNodeEntries().each { cne ->
+	    checkNode(cne.getNodeState(), path+'/'+cne.getName());	
+	}
+    }
     
     
     
     def fixMimeTypes(){
-        println "Fixing mimetypes"
+        println("Fixing mimetypes");
         def timeStarted = new Date().getTime();
         
         checkNode(nodeStore.getRoot().getChildNode("content").getChildNode("dam"));
@@ -55,7 +55,7 @@ class TextRenditionMimeTypeFixer {
         
         println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validRenditionCount} valid text renditions and fixed ${fixedRenditionCount}");
 
-        println "Done"
+        println("Done")
     }
 }
 
