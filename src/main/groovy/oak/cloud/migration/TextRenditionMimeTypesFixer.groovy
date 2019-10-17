@@ -1,6 +1,7 @@
 import org.apache.jackrabbit.oak.spi.commit.EmptyHook
 import org.apache.jackrabbit.oak.spi.state.NodeStore
 import org.apache.jackrabbit.oak.commons.PathUtils
+import org.apache.jackrabbit.oak.spi.commit.CommitInfo
 import com.google.common.collect.Lists
 import java.util.List
 
