@@ -17,7 +17,7 @@ class TextRenditionMimeTypeFixer {
 	    ns = ns.getChildNode('jcr:content');
 
 	    if(ns.getString('jcr:mimeType')==null){
-		ns.builder.setProperty('jcr:mimeType','text/plain');
+		ns.builder().setProperty('jcr:mimeType','text/plain');
 		println("Updated mimetype at "+path);
 		++fixedRenditionCount;
 	    } else {
