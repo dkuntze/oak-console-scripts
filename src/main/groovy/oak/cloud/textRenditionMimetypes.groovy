@@ -59,5 +59,5 @@ class TextRenditionMimeTypeFixer {
     }
 }
 
-new TextRenditionMimeTypeFixer(nodeStore: session.store).fixMimeTypes()
+new TextRenditionMimeTypeFixer(nodeStore: session.store).fixMimeTypes();
 
