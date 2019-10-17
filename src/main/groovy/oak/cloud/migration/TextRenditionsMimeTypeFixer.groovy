@@ -33,7 +33,7 @@ class TextRenditionMimeTypeFixer {
 
 	if(fixedRenditionCount > 0 &&  fixedRenditionCount % 1000 == 0){
 	   println("Saving 1000 fixed renditions");	
-	   nodeStore.merge(nodeStore.root.builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	   nodeStore.merge(nodeStore.getRoot().builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
 	   println("Saved");	
 	}
 
@@ -50,7 +50,7 @@ class TextRenditionMimeTypeFixer {
         def timeStarted = new Date().getTime();
         
         traverse(nodeStore.getRoot().getChildNode("content").getChildNode("dam").getChildNode("marketing"), "/content/dam/marketing", "marketing");
-        nodeStore.getRoot.merge(nodeStore.root.builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
+        nodeStore.merge(nodeStore.getRoot().builder(), EmptyHook.INSTANCE, CommitInfo.EMPTY);
         def timeTaken = new Date().getTime() - timeStarted;
         
         println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validRenditionCount} valid text renditions and fixed ${fixedRenditionCount}");
