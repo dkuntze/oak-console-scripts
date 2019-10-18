@@ -63,7 +63,9 @@ class TextRenditionMimeTypeFixer {
 	def nodeBuilder = rootNodeBuilder.getChildNode("content").getChildNode("dam");
 	    
         traverse(nodeState, nodeBuilder, "/content/dam", "dam", rootNodeBuilder);
-        nodeStore.merge(rootNodeBuilder, EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	if(needsSave){
+	    nodeStore.merge(rootNodeBuilder, EmptyHook.INSTANCE, CommitInfo.EMPTY);
+	}
         def timeTaken = new Date().getTime() - timeStarted;
         
         println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validRenditionCount} valid text renditions and fixed ${fixedRenditionCount}");
