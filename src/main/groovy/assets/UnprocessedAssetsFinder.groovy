@@ -100,7 +100,9 @@ class UnprocessedAssetsFinder {
 			
 			// Check child nodes
 			ns.getChildNodeEntries().each { cne ->
-				traverseDAM(cne.getNodeState(),basePath+"/"+cne.getName(), scene7Required);	
+				if(!"archive".equals(cne.getName())){
+					traverseDAM(cne.getNodeState(),basePath+"/"+cne.getName(), scene7Required);	
+				}
 			}
 
 		}
