@@ -9,6 +9,7 @@ class UnprocessedAssetsFinder {
 	def checkedAssetCount = 0 as long;
 	def unprocessedAssets = 0 as long;
 	def processingAssets = 0 as long;
+	def errorStatusAssets = 0 as long;
 	def scene7MissingAssets = 0 as long;
 	def scene7UnpublishedAssets = 0 as long;
 	
@@ -23,6 +24,7 @@ class UnprocessedAssetsFinder {
 		println("Checked $checkedAssetCount assets in ${timeTaken}ms");
 		println("Found $unprocessedAssets 'unprocessed' assets");
 		println("Found $processingAssets 'processing' assets");
+		println("Found $errorStatusAssets 'errorStatusAssets' assets");
 		println("Found $scene7MissingAssets assets missing from Scene7");
 		println("Found $scene7UnpublishedAssets assets unpublished in Scene7");
 	}
@@ -50,6 +52,7 @@ class UnprocessedAssetsFinder {
 		if(nodeType.equals("dam:Asset")){
 			boolean unprocessed = false;
 			boolean processing = false;
+			boolean errorStatus = false;
 			boolean scene7Missing = false;
 			boolean scene7Unpublished = false;
 			
@@ -57,12 +60,17 @@ class UnprocessedAssetsFinder {
 			
 			if(ns.hasChildNode("jcr:content")){
 				def contentNode = ns.getChildNode("jcr:content");
-				
+				def status = contentNode.getString("status");
 				def assetState = contentNode.getString("dam:assetState");
 				
 				if(!"processed".equals(assetState)){
 					unprocessed = true;
 					++unprocessedAssets;
+				}
+				
+				if("Error".equals(status)){
+					errorStatus = true;
+					++errorStatusAssets;
 				}
 				
 				if("processing".equals(assetState)){
@@ -82,8 +90,8 @@ class UnprocessedAssetsFinder {
 					} 	
 				}
 				
-				if(unprocessed || processing || scene7Missing || scene7Unpublished){
-					println("$basePath,$createdDate,$unprocessed,$processing,$scene7Missing,$scene7Unpublished");
+				if(unprocessed || processing || errorStatus || scene7Missing || scene7Unpublished){
+					println("$basePath,$createdDate,$unprocessed,$processing,$errorStatus,$scene7Missing,$scene7Unpublished");
 				}
 			
 			} 
@@ -100,7 +108,7 @@ class UnprocessedAssetsFinder {
 			
 			// Check child nodes
 			ns.getChildNodeEntries().each { cne ->
-				if(!"archive".equals(cne.getName())){
+				if(!"archive".equals(cne.getName()) && !"uncategorized".equals(cne.getName()) && !"manual-upload".equals(cne.getName())){
 					traverseDAM(cne.getNodeState(),basePath+"/"+cne.getName(), scene7Required);	
 				}
 			}
