@@ -70,7 +70,7 @@ class UnprocessedAssetsFinder {
 					unprocessed = true;
 					++unprocessedAssets;
 					
-					Property p = contentNode.getChildNode("renditions").getChildNode("original").getChildNode("jcr:content").getProperty("jcr:data");
+					PropertyState p = contentNode.getChildNode("renditions").getChildNode("original").getChildNode("jcr:content").getProperty("jcr:data");
 					if(p!=null){
 						Blob orig = p.getValue(org.apache.jackrabbit.oak.api.Type.BINARY);
 						long size = getBlobSizeFromId(orig.getContentIdentity());
