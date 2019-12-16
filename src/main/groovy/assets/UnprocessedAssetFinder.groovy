@@ -70,12 +70,15 @@ class UnprocessedAssetsFinder {
 					unprocessed = true;
 					++unprocessedAssets;
 					
-					Blob orig = ns.getChildNode("jcr:content").getChildNode("renditions").getChildNode("original").getChildNode("jcr:content").getProperty("jcr:data").getValue(org.apache.jackrabbit.oak.api.Type.BINARY);
-					long size = getBlobSizeFromId(orig.getContentIdentity());
-					
-					if(size==0){
-						zeroByte = true;
-						++zeroByteAssets;
+					Property p = contentNode.getChildNode("renditions").getChildNode("original").getChildNode("jcr:content").getProperty("jcr:data");
+					if(p!=null){
+						Blob orig = p.getValue(org.apache.jackrabbit.oak.api.Type.BINARY);
+						long size = getBlobSizeFromId(orig.getContentIdentity());
+
+						if(size==0){
+							zeroByte = true;
+							++zeroByteAssets;
+						}
 					}
 				}
 				
