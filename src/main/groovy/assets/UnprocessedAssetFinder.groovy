@@ -12,6 +12,7 @@ class UnprocessedAssetsFinder {
 	def errorStatusAssets = 0 as long;
 	def scene7MissingAssets = 0 as long;
 	def scene7UnpublishedAssets = 0 as long;
+	def zeroByteAssets = 0 as long;
 	
 	def check(){
 		def timeStarted = new Date().getTime();
@@ -24,6 +25,7 @@ class UnprocessedAssetsFinder {
 		println("Checked $checkedAssetCount assets in ${timeTaken}ms");
 		println("Found $unprocessedAssets 'unprocessed' assets");
 		println("Found $processingAssets 'processing' assets");
+		println("Found $zeroByteAssets 'zeroByte' assets");
 		println("Found $errorStatusAssets 'errorStatusAssets' assets");
 		println("Found $scene7MissingAssets assets missing from Scene7");
 		println("Found $scene7UnpublishedAssets assets unpublished in Scene7");
@@ -55,6 +57,7 @@ class UnprocessedAssetsFinder {
 			boolean errorStatus = false;
 			boolean scene7Missing = false;
 			boolean scene7Unpublished = false;
+			boolean zeroByte = false;
 			
 			def createdDate = ns.getProperty("jcr:created").getValue(org.apache.jackrabbit.oak.api.Type.DATE);
 			
@@ -66,6 +69,14 @@ class UnprocessedAssetsFinder {
 				if(!"processed".equals(assetState)){
 					unprocessed = true;
 					++unprocessedAssets;
+					
+					Blob orig = ns.getChildNode("jcr:content").getChildNode("renditions").getChildNode("original").getChildNode("jcr:content").getProperty("jcr:data").getValue(org.apache.jackrabbit.oak.api.Type.BINARY);
+					long size = getBlobSizeFromId(orig.getContentIdentity());
+					
+					if(size==0){
+						zeroByte = true;
+						++zeroByteAssets;
+					}
 				}
 				
 				if("Error".equals(status)){
@@ -90,8 +101,8 @@ class UnprocessedAssetsFinder {
 					} 	
 				}
 				
-				if(unprocessed || processing || errorStatus || scene7Missing || scene7Unpublished){
-					println("$basePath,$createdDate,$unprocessed,$processing,$errorStatus,$scene7Missing,$scene7Unpublished");
+				if(unprocessed || processing || zeroByte || errorStatus || scene7Missing || scene7Unpublished){
+					println("$basePath,$createdDate,$unprocessed,$processing,$zeroByte, $errorStatus,$scene7Missing,$scene7Unpublished");
 				}
 			
 			} 
@@ -115,6 +126,17 @@ class UnprocessedAssetsFinder {
 
 		}
 		
+	}
+	
+	
+	static long getBlobSizeFromId(String blobId) {
+         if (blobId) {
+            int indexOfHash = blobId.lastIndexOf('#')
+            if (indexOfHash > 0) {
+               return blobId.substring(indexOfHash + 1) as long
+            }
+        }
+        return 0
 	}
 	
 }
