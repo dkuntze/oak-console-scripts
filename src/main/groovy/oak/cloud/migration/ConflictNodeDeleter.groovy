@@ -5,8 +5,10 @@ import org.apache.jackrabbit.oak.spi.commit.CommitInfo
 import com.google.common.collect.Lists
 import java.util.List
 
-
-class TextRenditionMimeTypeFixer {
+/**
+ * A brute force conflict node removal utility. This class is meant to be run via the oak-run console.
+ */
+class ConflictNodeDeleter {
 	def NodeStore nodeStore;
 
 	def validRenditionCount = 0 as long;
@@ -64,4 +66,4 @@ class TextRenditionMimeTypeFixer {
 	}
 }
 
-new TextRenditionMimeTypeFixer(nodeStore: session.store).fixIt();
+new ConflictNodeDeleter(nodeStore: session.store).fixIt();
