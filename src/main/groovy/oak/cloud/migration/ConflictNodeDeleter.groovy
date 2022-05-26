@@ -1,9 +1,6 @@
 import org.apache.jackrabbit.oak.spi.commit.EmptyHook
 import org.apache.jackrabbit.oak.spi.state.NodeStore
-import org.apache.jackrabbit.oak.commons.PathUtils
 import org.apache.jackrabbit.oak.spi.commit.CommitInfo
-import com.google.common.collect.Lists
-import java.util.List
 
 /**
  * A brute force conflict node removal utility. This class is meant to be run via the oak-run console.
@@ -11,19 +8,20 @@ import java.util.List
 class ConflictNodeDeleter {
 	def NodeStore nodeStore;
 
-	def validRenditionCount = 0 as long;
-	def fixedRenditionCount = 0 as long;
+	def validNodeCount = 0 as long;
+	def fixedNodeCount = 0 as long;
 	def checkedNodeCount = 0 as long;
 	def needsSave = false;
 
-	def traverse(ns, nb, path, name, rnb){
+	def traverse(ns, nb, path, name, rnb) {
 
+		//if name matches, remove the node
 		if (name==':conflict') {
 			nb.remove();
 			println("Removed node at " + path);
-			++fixedRenditionCount;
+			++fixedNodeCount;
 		} else {
-			++validRenditionCount;
+			++validNodeCount;
 		}
 
 
@@ -32,8 +30,8 @@ class ConflictNodeDeleter {
 			println("Checked $checkedNodeCount");
 		}
 
-		if(needsSave &&  fixedRenditionCount % 1000 == 0){
-			println("Saving 1000 fixed renditions");
+		if(needsSave &&  fixedNodeCount % 1000 == 0){
+			println("Saving 1000 fixed nodes");
 			nodeStore.merge(rnb, EmptyHook.INSTANCE, CommitInfo.EMPTY);
 			println("Saved");
 			needsSave=false;
@@ -60,7 +58,7 @@ class ConflictNodeDeleter {
 		}
 		def timeTaken = new Date().getTime() - timeStarted;
 
-		println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validRenditionCount} valid nodes and fixed ${fixedRenditionCount}");
+		println("Checked $checkedNodeCount nodes in ${timeTaken}ms, found ${validNodeCount} valid nodes and fixed ${fixedNodeCount}");
 
 		println("Done")
 	}
