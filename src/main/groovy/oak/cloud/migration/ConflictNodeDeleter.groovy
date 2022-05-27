@@ -18,6 +18,7 @@ class ConflictNodeDeleter {
 		//if name matches, remove the node
 		if (name==':conflict') {
 			nb.remove();
+			needsSave=true;
 			println("Removed node at " + path);
 			++fixedNodeCount;
 		} else {
